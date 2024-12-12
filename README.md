@@ -35,3 +35,56 @@ $\beta^t 是当前参数值，\nabla f(\beta^t)是目标函数的一阶导数，
 梯度向量: $g = X^T(p-y)$ ， 注意$x_i$是数据向量，不是一个值， $p_i$也是一个向量，也就是带入参数后某一个函数点的预测值的向量
 
 Hessian matrix: $X^TWX$
+
+# IRIS数据案例
+
+```
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+# 读取数据
+df = pd.read_csv(f'D:/Download/iris.csv')
+# 标签是第五列
+labels = df.iloc[:,4]
+# 只保留两个品种，根据标签筛选
+filtered_df = df[labels.isin(['setosa', 'versicolor'])]
+# 提取训练数据
+data = filtered_df.iloc[:,:4]
+# 提取标签
+labels = filtered_df.iloc[:,4]
+# 把'setosa' 品种标签改为1， 另一个改为0
+labels = labels.replace({'setosa': 1, 'versicolor': 0})
+# columne bind 数据，把100*1个1和data列合并
+data = np.c_[np.ones((len(data), 1)), data]
+```
+
+还剩下100行数据，这里为了简便就不分训练集和测试集了，直接同一个数据训练和测试
+
+```
+def sigmoid(z):
+    # 返回预测的概率向量
+    return 1 / (1 + np.exp(-z))
+
+def newton(iterations, initial_para, data, labels):
+    params = np.array(initial_para,dtype = float)  # [a, b, c, d, e]
+    data = np.array(data)
+    labels = np.array(labels)
+    losses = []
+    for _ in range(iterations):
+        # 线性回归部分，数据矩阵乘参数向量 
+        z = data @ params
+        # 概率向量
+        probabilities = sigmoid(z)
+        # 记录损失函数的值
+        loss = -np.sum(labels * np.log(probabilities) + (1 - labels) * np.log(1 - probabilities))
+        losses.append(loss)
+        errors = probabilities - labels  # (N,)
+        # 梯度向量的公式，上面有写出
+        g_vector = data.T @ errors  # (d,)
+        # Hessian 矩阵计算
+        W = np.diag(probabilities * (1 - probabilities))  # 对角矩阵 (N, N)
+        Hessian = data.T @ W @ data  # (d, d)
+        # 参数更新
+        params -= np.linalg.inv(Hessian) @ g_vector
+    return params,losses
+```
