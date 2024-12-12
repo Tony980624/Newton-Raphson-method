@@ -23,3 +23,9 @@ $\beta^t 是当前参数值，\nabla f(\beta^t)是目标函数的一阶导数，
 # 逻辑回归例子
 
 损失函数: $Loss = -\sum^N_{i=1}[y_ilog(p_i)+(1-y_i)log(1-p_i)]$
+
+![d](https://github.com/Tony980624/Newton-Raphson-method/blob/main/output1.png)
+
+假如真实标签是1，预测的p也是1，（p的意思是x=1的概率），那么log(p) = log(1) = 0, 0*1 = 0,损失为0. 完全精准预测。
+
+反之如果真实标签是1，预测的label=1的概率越低，那么就越不准确，log(p)的值越会越来越负，损失函数就越来越大
