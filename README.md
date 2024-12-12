@@ -111,6 +111,8 @@ params,loss = newton(iterations=10, initial_para=initial_para, data=data, labels
 plt.plot(loss)
 ```
 
+![d](https://github.com/Tony980624/Newton-Raphson-method/blob/main/output8.png)
+
 ## 建立模型并预测
 
 ```
