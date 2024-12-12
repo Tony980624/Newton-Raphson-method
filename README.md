@@ -34,7 +34,21 @@ $\beta^t 是当前参数值，\nabla f(\beta^t)是目标函数的一阶导数，
 
 梯度向量: $g = X^T(p-y)$ ， 注意$x_i$是数据向量，不是一个值， $p_i$也是一个向量，也就是带入参数后某一个函数点的预测值的向量
 
-Hessian matrix: $X^TWX$
+Hessian matrix: $X^TWX$ 
+
+$$
+W = \begin{bmatrix}
+w_1 & 0 & 0 & \cdots & 0 \\
+0 & w_2 & 0 & \cdots & 0 \\
+0 & 0 & w_3 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & w_N
+\end{bmatrix}
+$$
+
+其中：
+
+$w_i = p_i (1 - p_i), \quad i = 1, 2, \dots, N$ ， 数据每一行的权重
 
 # IRIS数据案例
 
@@ -81,10 +95,51 @@ def newton(iterations, initial_para, data, labels):
         errors = probabilities - labels  # (N,)
         # 梯度向量的公式，上面有写出
         g_vector = data.T @ errors  # (d,)
-        # Hessian 矩阵计算
+        # np.diag意思是扩充为对角矩阵，对角上每个值是每一行数据等于1的概率乘以等于0的概率
         W = np.diag(probabilities * (1 - probabilities))  # 对角矩阵 (N, N)
         Hessian = data.T @ W @ data  # (d, d)
         # 参数更新
         params -= np.linalg.inv(Hessian) @ g_vector
     return params,losses
 ```
+
+## 查看损失函数
+
+```
+initial_para = [0, 0, 0, 0, 0]
+params,loss = newton(iterations=10, initial_para=initial_para, data=data, labels=labels)
+plt.plot(loss)
+```
+
+## 建立模型并预测
+
+```
+class logistic_mdel:
+    def __init__(self,parameters):
+        self.parameters = np.array(parameters)
+    def sigmoid(self,z):
+        return 1/(1+np.exp(-z))
+    def predict_proba(self,X):
+        z = X@self.parameters
+        return self.sigmoid(z)
+    def predict(self,X,threshold = 0.5):
+        probabilities = self.predict_proba(X)
+        return (probabilities>=threshold).astype(int)
+    
+model = logistic_mdel(parameters=params)
+proba = model.predict(data)
+from sklearn.metrics import confusion_matrix
+conf_matrix = confusion_matrix(labels, proba)
+print("Confusion Matrix:")
+print(conf_matrix)
+
+```
+
+在训练集上True positive 和 True negative都全对
+
+$$
+Confusion Matrix: \begin{bmatrix}
+50&0\\
+0&50
+\end{bmatrix}
+$$
