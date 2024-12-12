@@ -21,3 +21,5 @@ $\beta^t 是当前参数值，\nabla f(\beta^t)是目标函数的一阶导数，
 牛顿法就是随机初始参数，代入当前参数计算出Gradient向量和Hessian矩阵，最后用当前参数减去（Hessian的逆矩阵乘Gradient向量), $x^{k+1}=x^{k}-H^{-1}\nabla{g}$
 
 # 逻辑回归例子
+
+损失函数: $Loss = -\sum^N_{i=1}[y_ilog(p_i)+(1-y_i)log(1-p_i)]$
